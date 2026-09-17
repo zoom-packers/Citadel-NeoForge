@@ -118,13 +118,13 @@ public abstract class GuiBasicBook extends Screen {
         if (follow) {
             quaternion.mul(quaternion1);
         }
-        matrixstack.mulPose(quaternion);
+        matrixstack.rotate(quaternion);
         if (follow) {
-            matrixstack.mulPose(new Quaternionf().rotateY((float) Math.toRadians(180.0F + f * 40.0F)));
+            matrixstack.rotate(new Quaternionf().rotateY((float) Math.toRadians(180.0F + f * 40.0F)));
         }
-        matrixstack.mulPose(new Quaternionf().rotateX((float) Math.toRadians(-xRot)));
-        matrixstack.mulPose(new Quaternionf().rotateY((float) Math.toRadians(yRot)));
-        matrixstack.mulPose(new Quaternionf().rotateZ((float) Math.toRadians(zRot)));
+        matrixstack.rotate(new Quaternionf().rotateX((float) Math.toRadians(-xRot)));
+        matrixstack.rotate(new Quaternionf().rotateY((float) Math.toRadians(yRot)));
+        matrixstack.rotate(new Quaternionf().rotateZ((float) Math.toRadians(zRot)));
         WorldRenderMacros.BufferSource bufferSource = WorldRenderMacros.getBufferSource();
         VertexConsumer vertexConsumer = bufferSource.getBuffer(RenderTypes.entityCutout(tex, false));
         model.resetToDefaultPose();
@@ -448,7 +448,7 @@ public abstract class GuiBasicBook extends Screen {
         }
     }
 
-    /** Images, recipe chrome, recipe contents, item icons — after page text so they stay on top of prose where intended. */
+    /** Images, recipe chrome, recipe contents, item icons â€” after page text so they stay on top of prose where intended. */
     private void renderBookFlatEmbeds(GuiGraphicsExtractor guiGraphics, float partialTicks) {
         int k = (this.width - this.xSize) / 2;
         int l = (this.height - this.ySize + 128) / 2;

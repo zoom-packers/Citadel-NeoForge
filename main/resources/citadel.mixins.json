@@ -5,6 +5,7 @@
   "compatibilityLevel": "JAVA_21",
   "refmap": "citadel.refmap.json",
   "mixins": [
+    "BiomeMixin",
     "BlockBehaviourAccessor",
     "ChunkGeneratorMixin",
     "EntityTeamColorMixin",

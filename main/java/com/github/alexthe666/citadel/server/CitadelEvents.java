@@ -14,6 +14,7 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.SwingAnimation;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LecternBlock;
 import net.minecraft.world.level.block.entity.LecternBlockEntity;
@@ -56,7 +57,7 @@ public class CitadelEvents {
                     event.getItemStack().shrink(1);
                 }
                 event.getLevel().setBlockEntity(newBe);
-                event.getEntity().swing(event.getHand(), true);
+                event.getEntity().swing(event.getHand(), SwingAnimation.DEFAULT, true);
                 event.getLevel().playSound(null, event.getPos(), SoundEvents.BOOK_PUT, SoundSource.BLOCKS, 1.0F, 1.0F);
             }
         }

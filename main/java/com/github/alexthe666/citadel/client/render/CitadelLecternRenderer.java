@@ -62,8 +62,8 @@ public class CitadelLecternRenderer implements BlockEntityRenderer<CitadelLecter
         }
         poseStack.pushPose();
         poseStack.translate(0.5D, 1.0625D, 0.5D);
-        poseStack.mulPose(Axis.YP.rotationDegrees(-state.yRotDegrees));
-        poseStack.mulPose(Axis.ZP.rotationDegrees(67.5F));
+        poseStack.rotate(Axis.YP.rotationDegrees(-state.yRotDegrees));
+        poseStack.rotate(Axis.ZP.rotationDegrees(67.5F));
         poseStack.translate(0.0D, -0.125D, 0.0D);
         submitNodeCollector.submitModel(
                 this.bookModel,
@@ -73,7 +73,8 @@ public class CitadelLecternRenderer implements BlockEntityRenderer<CitadelLecter
                 state.lightCoords,
                 OverlayTexture.NO_OVERLAY,
                 state.pageColor,
-                null);
+                null,
+                0);
         submitNodeCollector.submitModel(
                 this.bookModel,
                 BOOK_ANIM_STATE,
@@ -82,7 +83,8 @@ public class CitadelLecternRenderer implements BlockEntityRenderer<CitadelLecter
                 state.lightCoords,
                 OverlayTexture.NO_OVERLAY,
                 state.bindingColor,
-                null);
+                null,
+                0);
         poseStack.popPose();
     }
 

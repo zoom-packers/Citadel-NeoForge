@@ -2,8 +2,9 @@ package com.github.alexthe666.citadel.mixin;
 
 import com.github.alexthe666.citadel.server.generation.IExtendedNoiseGeneratorSettings;
 import com.github.alexthe666.citadel.server.generation.SurfaceRulesManager;
+import net.minecraft.core.Holder;
 import net.minecraft.world.level.levelgen.NoiseGeneratorSettings;
-import net.minecraft.world.level.levelgen.SurfaceRules;
+import net.minecraft.world.level.levelgen.material.rule.MaterialRule;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -20,17 +21,18 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 public class NoiseGeneratorSettingsMixin implements IExtendedNoiseGeneratorSettings {
 
     @Shadow
-    private SurfaceRules.RuleSource surfaceRule;
+    private Holder<MaterialRule> materialRule;
 
     @Unique
     private SurfaceRulesManager.RuleCategory citadel$ruleCategory = null;
 
-    @Inject(method = "surfaceRule", at = @At("HEAD"), cancellable = true)
-    private void citadel$surfaceRule(CallbackInfoReturnable<SurfaceRules.RuleSource> cir) {
+    @Inject(method = "materialRule", at = @At("HEAD"), cancellable = true)
+    private void citadel$materialRule(CallbackInfoReturnable<Holder<MaterialRule>> cir) {
         // Never cache: always use current field so other mods (WorldWeaver, Blueprint) that
-        // overwrite surfaceRule later are included in the merge (original first, then Citadel).
+        // overwrite materialRule later are included in the merge (original first, then Citadel).
         if (this.citadel$ruleCategory != null && SurfaceRulesManager.hasRulesForCategory(this.citadel$ruleCategory)) {
-            cir.setReturnValue(SurfaceRulesManager.mergeRulesForCategory(this.citadel$ruleCategory, this.surfaceRule));
+            MaterialRule merged = SurfaceRulesManager.mergeRulesForCategory(this.citadel$ruleCategory, this.materialRule.value());
+            cir.setReturnValue(Holder.direct(merged));
         }
     }
 

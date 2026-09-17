@@ -163,7 +163,7 @@ public abstract class AbstractPathJob implements Callable<Path> {
 
         this.world = new ChunkCache(world, new BlockPos(minX, world.dimensionType().minY(), minZ), new BlockPos(maxX, world.dimensionType().minY() + world.dimensionType().height(), maxZ), range, world.dimensionType());
 
-        this.start = new BlockPos(start);
+        this.start = new BlockPos(start.getX(), start.getY(), start.getZ());
         this.end = end;
 
         this.maxRange = range;
@@ -314,7 +314,7 @@ public abstract class AbstractPathJob implements Callable<Path> {
         BlockState bs = world.getBlockState(pos);
         // 1 Up when we're standing within this collision shape
         final VoxelShape collisionShape = bs.getBlockSupportShape(world, pos);
-        if (bs.blocksMotion() && collisionShape.max(Direction.Axis.X) > 0) {
+        if (bs.getBlock() != Blocks.COBWEB && bs.getBlock() != Blocks.BAMBOO_SAPLING && bs.isSolid() && collisionShape.max(Direction.Axis.X) > 0) {
             final double relPosX = Math.abs(entity.getX() % 1);
             final double relPosZ = Math.abs(entity.getZ() % 1);
 
@@ -330,7 +330,9 @@ public abstract class AbstractPathJob implements Callable<Path> {
         }
 
         BlockState down = world.getBlockState(pos.below());
-        while (!bs.blocksMotion() && !down.blocksMotion() && !down.getBlock().isLadder(down, world, pos.below(), entity) && bs.getFluidState().isEmpty()) {
+        while ((bs.getBlock() == Blocks.COBWEB || bs.getBlock() == Blocks.BAMBOO_SAPLING || !bs.isSolid())
+                && (down.getBlock() == Blocks.COBWEB || down.getBlock() == Blocks.BAMBOO_SAPLING || !down.isSolid())
+                && !down.getBlock().isLadder(down, world, pos.below(), entity) && bs.getFluidState().isEmpty()) {
             pos.move(Direction.DOWN, 1);
             bs = down;
             down = world.getBlockState(pos.below());
@@ -731,7 +733,7 @@ public abstract class AbstractPathJob implements Callable<Path> {
      * @return true if so.
      */
     public boolean isLiquid(final BlockState state) {
-        return state.liquid() || (!state.blocksMotion() && !state.getFluidState().isEmpty());
+        return state.liquid() || ((state.getBlock() == Blocks.COBWEB || state.getBlock() == Blocks.BAMBOO_SAPLING || !state.isSolid()) && !state.getFluidState().isEmpty());
     }
 
     /**
@@ -1286,7 +1288,7 @@ public abstract class AbstractPathJob implements Callable<Path> {
 
         if (!block.isAir()) {
             final VoxelShape shape = block.getBlockSupportShape(world, pos);
-            if (block.blocksMotion() && !(shape.isEmpty() || shape.max(Direction.Axis.Y) <= 0.1)) {
+            if (block.getBlock() != Blocks.COBWEB && block.getBlock() != Blocks.BAMBOO_SAPLING && block.isSolid() && !(shape.isEmpty() || shape.max(Direction.Axis.Y) <= 0.1)) {
                 if (block.getBlock() instanceof TrapDoorBlock) {
                     final BlockPos dir = pos.subtract(parentPos);
                     if (dir.getY() != 0 && dir.getX() == 0 && dir.getZ() == 0) {

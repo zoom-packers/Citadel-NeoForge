@@ -1,7 +1,7 @@
 package com.github.alexthe666.citadel.client.shader;
 
 import com.github.alexthe666.citadel.Citadel;
-import com.mojang.blaze3d.GpuFormat;
+import com.mojang.renderpearl.api.GpuFormat;
 import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.pipeline.TextureTarget;
 import com.mojang.blaze3d.resource.GraphicsResourceAllocator;
@@ -41,7 +41,7 @@ public class PostEffectRegistry {
         int h = minecraft.getWindow().getHeight();
         for (Identifier id : registry) {
             PostChain postChain = minecraft.getShaderManager().getPostChain(id, LevelTargetBundle.MAIN_TARGETS);
-            TextureTarget renderTarget = new TextureTarget("Citadel post-effect " + id, w, h, false, GpuFormat.RGBA8_UNORM);
+            TextureTarget renderTarget = new TextureTarget("Citadel post-effect " + id, w, h, GpuFormat.RGBA8_UNORM, null);
             if (postChain == null) {
                 Citadel.LOGGER.warn("Failed to load post chain: {}", id);
                 renderTarget.destroyBuffers();

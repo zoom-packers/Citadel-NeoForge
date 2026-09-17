@@ -48,7 +48,7 @@ public class PathJobMoveAwayFromLocation extends AbstractPathJob
     {
         super(world, start, avoid, range, entity);
 
-        this.avoid = new BlockPos(avoid);
+        this.avoid = new BlockPos(avoid.getX(), avoid.getY(), avoid.getZ());
         this.avoidDistance = avoidDistance;
     }
 

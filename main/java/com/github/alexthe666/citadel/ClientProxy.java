@@ -215,7 +215,7 @@ public class ClientProxy extends ServerProxy {
     @SubscribeEvent
     public void onKeyPressed(ScreenEvent.KeyPressed.Pre event) {
         if (Minecraft.getInstance().gui.screen() instanceof TitleScreen && aprilFoolsTetrisGame != null && aprilFoolsTetrisGame.isStarted()) {
-            if (event.getKeyCode() == InputConstants.KEY_LEFT || event.getKeyCode() == InputConstants.KEY_RIGHT || event.getKeyCode() == InputConstants.KEY_DOWN || event.getKeyCode() == InputConstants.KEY_UP) {
+            if (event.getKey() == InputConstants.KEY_LEFT || event.getKey() == InputConstants.KEY_RIGHT || event.getKey() == InputConstants.KEY_DOWN || event.getKey() == InputConstants.KEY_UP) {
                 event.setCanceled(true);
             }
         }

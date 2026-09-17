@@ -35,13 +35,13 @@ public class SpaceStationPatreonRenderer extends CitadelPatreonRenderer {
         float scale = 0.4F;
         float rotation = Mth.wrapDegrees((tick * rotateSpeed) % 360);
         matrixStackIn.pushPose();
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(rotation));
+        matrixStackIn.rotate(Axis.YP.rotationDegrees(rotation));
         matrixStackIn.translate(0, entity.getBbHeight() + bob + (rotateHeight - 1F), entity.getBbWidth() * distanceIn);
         matrixStackIn.pushPose();
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(75));
+        matrixStackIn.rotate(Axis.XP.rotationDegrees(75));
         matrixStackIn.scale(scale, scale, scale);
-        matrixStackIn.mulPose(Axis.XP.rotationDegrees(90));
-        matrixStackIn.mulPose(Axis.YP.rotationDegrees(rotation * 10));
+        matrixStackIn.rotate(Axis.XP.rotationDegrees(90));
+        matrixStackIn.rotate(Axis.YP.rotationDegrees(rotation * 10));
         ClientProxy.CITADEL_MODEL.resetToDefaultPose();
         if(CitadelConstants.debugShaders()){
             PostEffectRegistry.renderEffectForNextTick(ClientProxy.RAINBOW_AURA_POST_SHADER);

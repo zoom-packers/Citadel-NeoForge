@@ -3,7 +3,9 @@ package com.github.alexthe666.citadel.config.biome;
 import com.github.alexthe666.citadel.Citadel;
 import com.google.gson.*;
 import net.minecraft.core.Holder;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.Identifier;
+import net.minecraft.tags.TagKey;
 import net.minecraft.util.GsonHelper;
 import net.minecraft.world.level.biome.Biome;
 
@@ -23,7 +25,29 @@ public class SpawnBiomeData {
     private SpawnBiomeData(SpawnBiomeEntry[][] biomesRead) {
         biomes = new ArrayList<>();
         for (SpawnBiomeEntry[] innerArray : biomesRead) {
-            biomes.add(Arrays.asList(innerArray));
+            for (SpawnBiomeEntry entry : innerArray) {
+                if (entry != null && entry.type == BiomeEntryType.BIOME_TAG && entry.value != null) {
+                    entry.value = conventionTag(entry.value);
+                }
+            }
+            List<SpawnBiomeEntry> pool = new ArrayList<>(Arrays.asList(innerArray));
+            repairContradictions(pool);
+            biomes.add(pool);
+        }
+    }
+
+    private static void repairContradictions(List<SpawnBiomeEntry> pool) {
+        boolean requiresWardenBiome = false;
+        for (SpawnBiomeEntry entry : pool) {
+            if (entry != null && !entry.negate && entry.type == BiomeEntryType.BIOME_TAG
+                    && "alexsmobs:skreechers_can_spawn_wardens".equals(entry.value)) {
+                requiresWardenBiome = true;
+                break;
+            }
+        }
+        if (requiresWardenBiome) {
+            pool.removeIf(entry -> entry != null && entry.negate && entry.type == BiomeEntryType.BIOME_TAG
+                    && entry.value != null && entry.value.endsWith(":no_default_monsters"));
         }
     }
 
@@ -48,6 +72,26 @@ public class SpawnBiomeData {
             }
         }
         return false;
+    }
+
+    private static String conventionTag(String value) {
+        if (value.startsWith("c:")) {
+            String path = value.substring("c:".length());
+            return switch (path) {
+                case "is_snowy", "is_plains", "is_wasteland" -> "alexsmobs:" + path;
+                default -> value;
+            };
+        }
+        if (!value.startsWith("forge:")) {
+            return value;
+        }
+        String path = value.substring("forge:".length());
+        return switch (path) {
+            case "is_dense/overworld" -> "c:is_dense_vegetation/overworld";
+            case "is_coniferous" -> "c:is_tree/coniferous";
+            case "is_snowy", "is_plains", "is_wasteland" -> "alexsmobs:" + path;
+            default -> "c:" + path;
+        };
     }
 
     public static class Deserializer implements JsonDeserializer<SpawnBiomeData>, JsonSerializer<SpawnBiomeData> {
@@ -75,26 +119,28 @@ public class SpawnBiomeData {
         public SpawnBiomeEntry(BiomeEntryType type, boolean remove, String value) {
             this.type = type;
             this.negate = remove;
-            this.value = value;
+            this.value = type == BiomeEntryType.BIOME_TAG ? conventionTag(value) : value;
         }
 
         public boolean matches(@Nullable Holder<Biome> biomeHolder, Identifier registryName) {
-            if(type.isDepreciated()){
+            if (type.isDepreciated()) {
                 Citadel.LOGGER.warn("biome config: BIOME_DICT and BIOME_CATEGORY are no longer valid in 1.19+. Please use BIOME_TAG instead.");
                 return false;
-            }else{
-                if(type == BiomeEntryType.BIOME_TAG){
-                    if(biomeHolder.tags().anyMatch(biomeTagKey -> biomeTagKey.location().toString().equals(value))){
-                        return !negate;
-                    }
-                    return negate;
-                } else {
-                    if (registryName.toString().equals(value)) {
-                        return !negate;
-                    }
+            }
+            if (type == BiomeEntryType.BIOME_TAG) {
+                if (biomeHolder == null) {
                     return negate;
                 }
+                Identifier tagId = Identifier.parse(value);
+                TagKey<Biome> tag = TagKey.create(Registries.BIOME, tagId);
+                boolean matched = biomeHolder.is(tag)
+                        || biomeHolder.tags().anyMatch(biomeTagKey -> biomeTagKey.location().toString().equals(value));
+                return matched ? !negate : negate;
             }
+            if (registryName != null && registryName.toString().equals(value)) {
+                return !negate;
+            }
+            return negate;
         }
     }
 }

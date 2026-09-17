@@ -1,7 +1,9 @@
 package com.github.alexthe666.citadel.client.render.pathfinding;
 
+import com.mojang.blaze3d.pipeline.RenderTarget;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import com.mojang.renderpearl.api.commands.RenderPass;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.TextRenderable;
@@ -19,6 +21,8 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalDouble;
 
 public class WorldRenderMacros {
     private static final int MAX_DEBUG_TEXT_RENDER_DIST_SQUARED = 8 * 8 * 16;
@@ -56,10 +60,16 @@ public class WorldRenderMacros {
                 return;
             }
             stagedVertexBuffer.upload();
-            for (Map.Entry<RenderType, StagedVertexBuffer.Draw> entry : draws.entrySet()) {
-                StagedVertexBuffer.ExecuteInfo info = stagedVertexBuffer.getExecuteInfo(entry.getValue());
-                if (info != null) {
-                    entry.getKey().prepare().drawFromBuffer(info);
+            RenderTarget mainTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
+            try (RenderPass renderPass = RenderSystem.getDevice()
+                    .createCommandEncoder()
+                    .createRenderPass(() -> "Citadel WorldRenderMacros", mainTarget.getColorTextureView(), Optional.empty(), mainTarget.getDepthTextureView(), OptionalDouble.empty())) {
+                RenderSystem.bindDefaultUniforms(renderPass);
+                for (Map.Entry<RenderType, StagedVertexBuffer.Draw> entry : draws.entrySet()) {
+                    StagedVertexBuffer.ExecuteInfo info = stagedVertexBuffer.getExecuteInfo(entry.getValue());
+                    if (info != null) {
+                        entry.getKey().prepare().drawFromBuffer(info, renderPass);
+                    }
                 }
             }
             stagedVertexBuffer.endDraw();
@@ -947,7 +957,7 @@ public class WorldRenderMacros {
 
             matrixStack.pushPose();
             matrixStack.translate(pos.getX() + 0.5d, pos.getY() + 0.75d, pos.getZ() + 0.5d);
-            matrixStack.mulPose(Minecraft.getInstance().gameRenderer.mainCamera().rotation());
+            matrixStack.rotate(Minecraft.getInstance().gameRenderer.mainCamera().rotation());
             matrixStack.scale(-0.014f, -0.014f, 0.014f);
             matrixStack.translate(0.0d, 18.0d, 0.0d);
 
