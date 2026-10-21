@@ -109,7 +109,7 @@ public class Citadel {
         if (FMLEnvironment.getDist().isClient()) {
             NeoForge.EVENT_BUS.register(PROXY);
         }
-        modContainer.registerConfig(ModConfig.Type.COMMON, ConfigHolder.SERVER_SPEC);
+        modContainer.registerConfig(ModConfig.Type.LOCAL, ConfigHolder.SERVER_SPEC);
         NeoForge.EVENT_BUS.register(new CitadelEvents());
     }
 

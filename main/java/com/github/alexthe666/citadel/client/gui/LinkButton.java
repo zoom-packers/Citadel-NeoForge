@@ -29,7 +29,6 @@ public class LinkButton extends Button {
         this(book, x, y, width, height, component, ItemStack.EMPTY, onPress);
     }
 
-    @Override
     public int getFGColor() {
         return this.isHovered ? book.getWidgetColor() : this.active ? 0X94745A : 10526880;
     }

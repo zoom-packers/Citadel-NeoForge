@@ -3,6 +3,7 @@ package com.github.alexthe666.citadel.server.generation;
 import com.github.alexthe666.citadel.config.ServerConfig;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.Holder;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.util.Mth;
 import net.minecraft.world.attribute.EnvironmentAttributeMap;
 import net.minecraft.world.attribute.EnvironmentAttributes;
@@ -13,7 +14,7 @@ import net.neoforged.neoforge.common.world.ModifiableBiomeInfo;
 public class SpawnProbabilityModifier implements BiomeModifier {
 
     @Override
-    public void modify(Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
+    public void modify(RegistryAccess registryAccess, Holder<Biome> biome, Phase phase, ModifiableBiomeInfo.BiomeInfo.Builder builder) {
         EnvironmentAttributeMap.Entry<Float, ?> entry = builder.getAttributes().get(EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY);
         float base = entry != null
                 ? entry.applyModifier(EnvironmentAttributes.CREATURE_WORLD_GEN_SPAWN_PROBABILITY.defaultValue())

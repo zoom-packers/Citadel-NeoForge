@@ -71,10 +71,24 @@ repositories {
     mavenCentral()
 }
 
+configurations {
+    shade
+    implementation.extendsFrom(shade)
+}
+
 dependencies {
     // Citadel Video.java (client) — same libraries as published Citadel; required for :citadel:compileJava.
-    implementation 'org.jcodec:jcodec:0.2.5'
-    implementation 'de.sfuhrm:jaad:0.8.7'
+    shade 'org.jcodec:jcodec:0.2.5'
+    shade 'de.sfuhrm:jaad:0.8.7'
+}
+
+// Bundle the video-decoding libs into the jar, as the official Citadel build does, so the standalone
+// artifact works outside a dev environment.
+tasks.named('jar', Jar).configure {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from({ configurations.shade.collect { zipTree(it) } }) {
+        exclude 'META-INF', 'META-INF/**'
+    }
 }
 
 tasks.withType(JavaCompile).configureEach { compileTask ->
@@ -88,5 +102,14 @@ idea {
     module {
         downloadSources = true
         downloadJavadoc = true
+    }
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            artifactId = 'citadelneoforge'
+            from components.java
+        }
     }
 }
