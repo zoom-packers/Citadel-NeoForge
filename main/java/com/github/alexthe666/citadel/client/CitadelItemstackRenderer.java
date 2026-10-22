@@ -5,6 +5,7 @@ import com.github.alexthe666.citadel.item.CitadelDataComponents;
 import com.github.alexthe666.citadel.item.data.FancyItemDisplay;
 import com.github.alexthe666.citadel.item.data.IconItemDisplay;
 import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.util.Util;
 import net.minecraft.client.Minecraft;
@@ -214,10 +215,10 @@ public final class CitadelItemstackRenderer implements ItemModel {
             collector.submitCustomGeometry(poseStack, renderType, (pose, buffer) -> {
                 Matrix4f mx = pose.pose();
                 int br = 255;
-                buffer.addVertex(mx, 1, 1, 0).setUv(sprite.getU1(), sprite.getV0()).setColor(br, br, br, 255).setLight(packedLight);
-                buffer.addVertex(mx, 0, 1, 0).setUv(sprite.getU0(), sprite.getV0()).setColor(br, br, br, 255).setLight(packedLight);
-                buffer.addVertex(mx, 0, 0, 0).setUv(sprite.getU0(), sprite.getV1()).setColor(br, br, br, 255).setLight(packedLight);
-                buffer.addVertex(mx, 1, 0, 0).setUv(sprite.getU1(), sprite.getV1()).setColor(br, br, br, 255).setLight(packedLight);
+                buffer.addVertex(mx, 1, 1, 0).setUv(sprite.getU1(), sprite.getV0()).setColor(br, br, br, 255).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose, 0, 0, 1);
+                buffer.addVertex(mx, 0, 1, 0).setUv(sprite.getU0(), sprite.getV0()).setColor(br, br, br, 255).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose, 0, 0, 1);
+                buffer.addVertex(mx, 0, 0, 0).setUv(sprite.getU0(), sprite.getV1()).setColor(br, br, br, 255).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose, 0, 0, 1);
+                buffer.addVertex(mx, 1, 0, 0).setUv(sprite.getU1(), sprite.getV1()).setColor(br, br, br, 255).setOverlay(OverlayTexture.NO_OVERLAY).setLight(packedLight).setNormal(pose, 0, 0, 1);
             });
         }
 
