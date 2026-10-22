@@ -9,6 +9,7 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.font.TextRenderable;
 import net.minecraft.client.renderer.StagedVertexBuffer;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.rendertype.PreparedRenderType;
 import net.minecraft.client.renderer.rendertype.RenderSetup;
 import net.minecraft.client.renderer.rendertype.RenderType;
 import net.minecraft.core.BlockPos;
@@ -18,6 +19,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Matrix4f;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -60,6 +62,13 @@ public class WorldRenderMacros {
                 return;
             }
             stagedVertexBuffer.upload();
+            // 26.3: prepare() loads a render type's textures the first time they are used, and a texture upload inside
+            // an open render pass throws ("Close the existing render pass before performing additional commands").
+            // So prepare every render type before the pass opens.
+            Map<RenderType, PreparedRenderType> prepared = new LinkedHashMap<>();
+            for (RenderType renderType : draws.keySet()) {
+                prepared.put(renderType, renderType.prepare());
+            }
             RenderTarget mainTarget = Minecraft.getInstance().gameRenderer.mainRenderTarget();
             try (RenderPass renderPass = RenderSystem.getDevice()
                     .createCommandEncoder()
@@ -68,7 +77,7 @@ public class WorldRenderMacros {
                 for (Map.Entry<RenderType, StagedVertexBuffer.Draw> entry : draws.entrySet()) {
                     StagedVertexBuffer.ExecuteInfo info = stagedVertexBuffer.getExecuteInfo(entry.getValue());
                     if (info != null) {
-                        entry.getKey().prepare().drawFromBuffer(info, renderPass);
+                        prepared.get(entry.getKey()).drawFromBuffer(info, renderPass);
                     }
                 }
             }

@@ -10,7 +10,6 @@ import com.github.alexthe666.citadel.client.gui.GuiCitadelPatreonConfig;
 import com.github.alexthe666.citadel.client.model.TabulaModel;
 import com.github.alexthe666.citadel.client.model.TabulaModelHandler;
 import com.github.alexthe666.citadel.client.render.pathfinding.WorldEventContext;
-import com.github.alexthe666.citadel.client.render.pathfinding.WorldRenderMacros;
 import com.github.alexthe666.citadel.client.rewards.CitadelCapes;
 import com.github.alexthe666.citadel.client.rewards.CitadelPatreonRenderer;
 import com.github.alexthe666.citadel.client.rewards.SpaceStationPatreonRenderer;
@@ -141,9 +140,8 @@ public class ClientProxy extends ServerProxy {
                     float speed = tag.getFloatOr("CitadelRotateSpeed", 1F);
                     float height = tag.getFloatOr("CitadelRotateHeight", 1F);
                     int packedLight = renderState.lightCoords;
-                    WorldRenderMacros.BufferSource buffer = WorldRenderMacros.getBufferSource();
-                    renderer.render(matrixStackIn, buffer, packedLight, event.getPartialTick(), player, distance, speed, height);
-                    buffer.endBatch();
+                    // 26.3: submitted with the player, not drawn in a render pass of its own (see CitadelPatreonRenderer#submit)
+                    renderer.submit(matrixStackIn, event.getSubmitNodeCollector(), packedLight, event.getPartialTick(), player, distance, speed, height);
                 }
             }
         }
